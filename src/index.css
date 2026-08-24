@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "Outfit", system-ui, sans-serif;
+  --color-primary: #aa3bff;
+  --color-bg-dark: #16171d;
+  --color-bg-light: #f8fafc;
+}
+
+body {
+  background-color: var(--color-bg-light);
+  color: #333;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: var(--color-bg-dark);
+    color: #f3f4f6;
+  }
+}
