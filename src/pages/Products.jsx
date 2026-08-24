@@ -270,7 +270,7 @@ export default function Products() {
                 <tr key={item._id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
                   <td className="py-4 px-4 align-top pt-6">
                     {item.imageUrl ? (
-                      <img src={`https://ampslight-server.onrender.com${item.imageUrl}`} alt={item.title} className="w-12 h-12 object-cover rounded-md border border-slate-200" />
+                      <img src={item.imageUrl.startsWith('data:') ? item.imageUrl : `https://ampslight-server.onrender.com${item.imageUrl}`} alt={item.title} className="w-12 h-12 object-cover rounded-md border border-slate-200" />
                     ) : (
                       <div className="w-12 h-12 bg-slate-50 border border-slate-200 rounded-md flex items-center justify-center text-[10px] text-slate-400 font-bold">Img</div>
                     )}

@@ -160,7 +160,7 @@ export default function Categories() {
                 <tr key={item._id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
                   <td className="py-4 px-4">
                     {item.imageUrl ? (
-                      <img src={`https://ampslight-server.onrender.com${item.imageUrl}`} alt={item.name} className="w-14 h-14 object-cover rounded-xl border border-slate-100" />
+                      <img src={item.imageUrl.startsWith('data:') ? item.imageUrl : `https://ampslight-server.onrender.com${item.imageUrl}`} alt={item.name} className="w-14 h-14 object-cover rounded-xl border border-slate-100" />
                     ) : (
                       <div className="w-14 h-14 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center text-[10px] text-slate-400 font-bold">No Img</div>
                     )}
