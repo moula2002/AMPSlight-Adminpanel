@@ -15,6 +15,9 @@ export default function Products() {
   const [selectedSubcategory, setSelectedSubcategory] = useState('');
   const [image, setImage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Edit State
+  const [editItem, setEditItem] = useState(null);
 
   const fetchProducts = async () => {
     try {
@@ -43,6 +46,38 @@ export default function Products() {
     fetchCategoriesAndSubcategories();
   }, []);
 
+  const openAddModal = () => {
+    setEditItem(null);
+    setTitle('');
+    setDescription('');
+    setSelectedCategory('');
+    setSelectedSubcategory('');
+    setImage(null);
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (product) => {
+    setEditItem(product);
+    setTitle(product.title);
+    setDescription(product.description || '');
+    setSelectedCategory(product.category?._id || '');
+    setSelectedSubcategory(product.subcategory?._id || '');
+    setImage(null);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this product?')) {
+      try {
+        await api.delete(`/products/${id}`);
+        fetchProducts();
+      } catch (error) {
+        console.error('Error deleting product:', error);
+        alert('Failed to delete product.');
+      }
+    }
+  };
+
   const handleSave = async () => {
     if (!title || !selectedCategory) return alert('Title and Category are required.');
     setIsSubmitting(true);
@@ -55,10 +90,17 @@ export default function Products() {
     if (image) formData.append('image', image);
 
     try {
-      await api.post('/products', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      if (editItem) {
+        await api.put(`/products/${editItem._id}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      } else {
+        await api.post('/products', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      }
       setIsModalOpen(false);
+      setEditItem(null);
       setTitle('');
       setDescription('');
       setSelectedCategory('');
@@ -86,7 +128,7 @@ export default function Products() {
             <h2 className="text-[28px] font-bold text-slate-900 tracking-tight">Products</h2>
             <p className="text-sm text-slate-500 mt-1">Manage your product catalog</p>
           </div>
-          <button onClick={() => setIsModalOpen(true)} className="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-6 py-2.5 rounded-lg font-semibold text-sm transition-colors shadow-md flex items-center gap-2">
+          <button onClick={openAddModal} className="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-6 py-2.5 rounded-lg font-semibold text-sm transition-colors shadow-md flex items-center gap-2">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4"/></svg>
             Add Product
           </button>
@@ -128,8 +170,8 @@ export default function Products() {
                     <span className="text-slate-400"> / {item.subcategory?.name || 'None'}</span>
                   </td>
                   <td className="py-4 px-4 text-right whitespace-nowrap">
-                    <button className="p-2.5 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-[#4f46e5] hover:border-[#4f46e5]/30 transition-all shadow-sm"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></button>
-                    <button className="p-2.5 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-red-500 hover:border-red-500/30 transition-all shadow-sm ml-2"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                    <button onClick={() => openEditModal(item)} className="p-2.5 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-[#4f46e5] hover:border-[#4f46e5]/30 transition-all shadow-sm"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></button>
+                    <button onClick={() => handleDelete(item._id)} className="p-2.5 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-red-500 hover:border-red-500/30 transition-all shadow-sm ml-2"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
                   </td>
                 </tr>
               ))}
@@ -139,7 +181,7 @@ export default function Products() {
         </div>
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Add New Product" onSave={handleSave}>
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editItem ? "Edit Product" : "Add New Product"} onSave={handleSave}>
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-2">Product Title</label>
           <input 
