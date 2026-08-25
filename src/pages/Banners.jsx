@@ -100,7 +100,7 @@ export default function Banners() {
   // Helper to format image URL (assuming server is running on localhost:5000 in dev or same host)
   const getImageUrl = (path) => {
     if (!path) return '';
-    if (path.startsWith('http')) return path;
+    if (path.startsWith('http') || path.startsWith('data:')) return path;
     const baseURL = api.defaults.baseURL || 'http://localhost:5000/api';
     return `${baseURL.replace('/api', '')}${path}`;
   };
