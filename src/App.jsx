@@ -6,6 +6,7 @@ import Categories from './pages/Categories';
 import Subcategories from './pages/Subcategories';
 import Products from './pages/Products';
 import Banners from './pages/Banners';
+import Projects from './pages/Projects';
 import Login from './pages/Login';
 import ProtectedRoute from './components/common/ProtectedRoute';
 
@@ -23,6 +24,7 @@ function App() {
             <Route path="categories" element={<Categories />} />
             <Route path="subcategories" element={<Subcategories />} />
             <Route path="products" element={<Products />} />
+            <Route path="projects" element={<Projects />} />
           </Route>
         </Route>
       </Routes>
